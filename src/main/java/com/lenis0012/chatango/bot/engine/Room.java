@@ -1,16 +1,21 @@
 package com.lenis0012.chatango.bot.engine;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
-import com.lenis0012.chatango.bot.Main;
+import com.lenis0012.chatango.bot.ChatangoAPI;
+import com.lenis0012.chatango.bot.api.Font;
 import com.lenis0012.chatango.bot.api.Message;
+import com.lenis0012.chatango.bot.api.RGBColor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.*;
 import java.math.BigInteger;
 import java.net.Socket;
-import java.util.Map;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.locks.Lock;
@@ -20,7 +25,7 @@ import java.util.logging.Level;
 public class Room extends Thread {
     private static final char END_CHAR = (char) 0x00;
     private static final byte[] BUFFER = new byte[1024];
-    private static final Map<String, Integer> weights = Maps.newConcurrentMap();
+    private static final List<Entry<String, Integer>> weights = Lists.newArrayList();
 
     static {
         try {
@@ -28,12 +33,10 @@ public class Room extends Thread {
             JsonArray list = (JsonArray) parser.parse(new FileReader(new File("weights.json")));
             for(int i = 0; i < list.size(); i++) {
                 JsonArray entry = list.get(i).getAsJsonArray();
-                String key = entry.get(0).getAsString();
-                int val = entry.get(1).getAsInt();
-                weights.put(key, val);
+                weights.add(new SimpleEntry<>(entry.get(0).getAsString(), entry.get(1).getAsInt()));
             }
         } catch(FileNotFoundException e) {
-            System.err.println("Missing weights.json file!");
+            throw new RuntimeException("Missing weights.json file (please add it to working dir)!");
         }
     }
 
@@ -45,10 +48,10 @@ public class Room extends Thread {
             lnv = Math.max(lnv, 1000);
         }
         float num =  (fnv % lnv) / lnv;
-        int maxnum =  weights.values().stream().mapToInt(Integer::intValue).sum();
+        int maxnum = weights.stream().mapToInt(Entry::getValue).sum();
         float sumfreq = 0;
         int sn = 0;
-        for(Entry<String, Integer> entry : weights.entrySet()) {
+        for(Entry<String, Integer> entry : weights) {
             sumfreq += ((float) entry.getValue()) / maxnum;
             if(num <= sumfreq) {
                 sn = Integer.parseInt(entry.getKey());
@@ -73,10 +76,17 @@ public class Room extends Thread {
     private String uid = "";
     private byte[] cache = new byte[0];
 
+    // Settings
+    @Getter @Setter
+    private Font defaultFont = Font.DEFAULT.clone();
+    @Getter @Setter
+    private RGBColor nameColor = new RGBColor("000");
+
     protected Room(String name, Engine engine) throws IOException {
         this.name = name;
         this.engine = engine;
         this.socket = new Socket("s" + getServerId(name) + ".chatango.com", 443);
+        socket.setSoTimeout(40000);
         this.output = socket.getOutputStream();
         this.input = socket.getInputStream();
         this.roomListener = new RoomListener(this);
@@ -85,7 +95,6 @@ public class Room extends Thread {
         while(uid.length() < 16) {
             uid += random.nextInt(10);
         }
-        System.out.println(uid);
     }
 
     @Override
@@ -115,23 +124,47 @@ public class Room extends Thread {
                     this.cache = newCache;
                 }
             } catch(IOException e) {
-                Main.getLogger().log(Level.WARNING, "Failed to read bytes!");
+                ChatangoAPI.getLogger().log(Level.WARNING, "Failed to read bytes, closing socket!");
+                try {
+                    socket.close();
+                } catch(IOException e1) {}
             }
         }
     }
 
     protected void login() {
         sendCommand("bauth", name, uid, engine.getCredentials().getUsername(), engine.getCredentials().getPassword());
-        this.writeLock.lock();
+        // Constantly ping.
+        new Thread() {
+            @Override
+            public void run() {
+                while(socket.isConnected()) {
+                    try {
+                        Thread.sleep(20000L);
+                    } catch(InterruptedException e) {
+                        // Ignore
+                    }
+                    sendCommand("");
+                }
+            }
+        }.start();
     }
 
-    protected void onMessage(Message message) {
-        Main.getLogger().log(Level.INFO, String.format("%s: %s", message.getUser().getName(), message.getText()));
+    public void message(Message message) {
+        String text = message.getText();
+        Font font = message.getFont() == null ? defaultFont : message.getFont();
+        String rawFont = Font.encodeFont(font);
+        String rawColor = nameColor.encode();
+        sendCommand("bmsg", "tl2r", rawColor + rawFont + text);
     }
 
     protected void sendCommand(String... args) {
+        if(!socket.isConnected()) {
+            return;
+        }
+
         String command = Joiner.on(':').join(args);
-        command = firstCommand ? command: command + "\r\n";
+        command = firstCommand ? command : command + "\r\n";
         this.firstCommand = false;
         writeLock.lock();
         try {
@@ -139,7 +172,10 @@ public class Room extends Thread {
             output.write(0x00);
             output.flush();
         } catch(IOException e) {
-            Main.getLogger().log(Level.SEVERE, "Error occurred while sending command", e);
+            ChatangoAPI.getLogger().log(Level.SEVERE, "Error occurred while sending command, closing socket!", e);
+            try {
+                socket.close();
+            } catch(IOException e1) {}
         } finally {
             writeLock.unlock();
         }

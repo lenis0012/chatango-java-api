@@ -1,17 +1,12 @@
 package com.lenis0012.chatango.bot.engine;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
-import com.google.common.reflect.ClassPath;
-import com.lenis0012.chatango.bot.Main;
+import com.lenis0012.chatango.bot.ChatangoAPI;
 import com.lenis0012.chatango.bot.api.Font;
 import com.lenis0012.chatango.bot.api.Message;
 import com.lenis0012.chatango.bot.api.User;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -41,7 +36,7 @@ public class RoomListener {
             try {
                 method.invoke(this, (Object) args);
             } catch(Exception e) {
-                Main.getLogger().log(Level.WARNING, "Something went wrong while handling incoming message", e);
+                ChatangoAPI.getLogger().log(Level.WARNING, "Something went wrong while handling incoming message", e);
             }
         }
     }
@@ -49,9 +44,9 @@ public class RoomListener {
     public void onI(String[] args) {
         StringBuilder builder = new StringBuilder();
         for(int i = 9; i < args.length; i++) {
-            builder.append(args[i]);
+            builder.append(":").append(args[i]);
         }
-        String rawMessage = builder.toString();
+        String rawMessage = builder.toString().substring(1);
 
         // Find font and anon id
         Matcher fontMatcher = FONT_PATTERN.matcher(rawMessage);
@@ -62,11 +57,20 @@ public class RoomListener {
 
         String text = rawMessage.replaceAll("<.*?>", "").replace("&lt", "<").replace("&gt", ">").replace("&quot", "\"").replace("&apos", "'").replace("&amp", "&");
         Message message = new Message(text, Font.parseFont(font), new User(name));
-        room.onMessage(message);
+    }
+
+    public void onB(String[] args) {
+        // TODO: Call message event
     }
 
     public void onOk(String[] args) {
-        Main.getLogger().log(Level.INFO, Arrays.asList(args).toString());
         // TODO: Store moderators
+    }
+
+    public void onInited(String[] args) {
+        room.sendCommand("g_participants", "start");
+        room.sendCommand("getpremium", "1");
+        room.sendCommand("blocklist", "block", "", "next", "500");
+        room.sendCommand("blocklist", "unblock", "", "next", "500");
     }
 }

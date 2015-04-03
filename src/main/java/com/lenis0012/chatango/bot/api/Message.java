@@ -5,6 +5,14 @@ public class Message {
     private Font font;
     private User user;
 
+    public Message(String message) {
+        this(message, null);
+    }
+
+    public Message(String message, Font font) {
+        this(message, font, null);
+    }
+
     public Message(String message, Font font, User user) {
         this.text = message;
         this.font = font;

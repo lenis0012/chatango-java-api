@@ -1,14 +1,9 @@
 package com.lenis0012.chatango.bot.engine;
 
-import com.lenis0012.chatango.bot.Main;
-import com.lenis0012.chatango.bot.utils.Utils;
+import com.lenis0012.chatango.bot.ChatangoAPI;
 
 import java.io.IOException;
-import java.net.URLConnection;
-import java.net.URL;
 import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 import java.util.logging.Level;
 
 public class Engine {
@@ -25,7 +20,7 @@ public class Engine {
             room.login();
             room.start();
         } catch(IOException e) {
-            Main.getLogger().log(Level.WARNING, "Failed to connect to room", e);
+            ChatangoAPI.getLogger().log(Level.WARNING, "Failed to connect to room", e);
         }
     }
 

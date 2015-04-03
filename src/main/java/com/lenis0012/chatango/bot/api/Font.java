@@ -57,6 +57,13 @@ public class Font {
         return new Font(type, size, color);
     }
 
+    public static String encodeFont(Font font) {
+        StringBuilder builder = new StringBuilder("<f x");
+        builder.append(font.size).append(font.color); // Append size and color
+        builder.append("=\"").append(font.type.ordinal()).append("\">"); // Append type
+        return builder.toString();
+    }
+
     public static enum FontType {
         ARIAL,
         COMIC,
