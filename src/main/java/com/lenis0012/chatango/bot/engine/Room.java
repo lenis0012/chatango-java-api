@@ -8,6 +8,7 @@ import com.lenis0012.chatango.bot.ChatangoAPI;
 import com.lenis0012.chatango.bot.api.Font;
 import com.lenis0012.chatango.bot.api.Message;
 import com.lenis0012.chatango.bot.api.RGBColor;
+import com.lenis0012.chatango.bot.events.Event;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +17,7 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.locks.Lock;
@@ -71,6 +73,8 @@ public class Room extends Thread {
     private final RoomListener roomListener;
 
     // Misc
+    @Getter
+    private final EventManager eventManager = new EventManager();
     private final Lock writeLock = new ReentrantLock();
     private boolean firstCommand = true;
     private String uid = "";

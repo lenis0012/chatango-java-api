@@ -1,12 +1,8 @@
 package com.lenis0012.chatango.bot;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonPrimitive;
 import com.lenis0012.chatango.bot.engine.Engine;
 import com.lenis0012.chatango.bot.utils.AuthException;
 import com.lenis0012.chatango.bot.utils.ForwardLogHandler;
-import com.lenis0012.chatango.bot.utils.JsonConfig;
-import com.lenis0012.chatango.bot.utils.Utils;
 
 import java.util.List;
 import java.util.logging.Handler;

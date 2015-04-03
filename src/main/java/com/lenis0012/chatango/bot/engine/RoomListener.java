@@ -5,6 +5,8 @@ import com.lenis0012.chatango.bot.ChatangoAPI;
 import com.lenis0012.chatango.bot.api.Font;
 import com.lenis0012.chatango.bot.api.Message;
 import com.lenis0012.chatango.bot.api.User;
+import com.lenis0012.chatango.bot.events.ConnectEvent;
+import com.lenis0012.chatango.bot.events.MessageReceiveEvent;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -42,6 +44,26 @@ public class RoomListener {
     }
 
     public void onI(String[] args) {
+        // TODO: Call message history event
+    }
+
+    public void onB(String[] args) {
+        room.getEventManager().callEvent(new MessageReceiveEvent(room, parseMessage(args)));
+    }
+
+    public void onOk(String[] args) {
+        // TODO: Store moderators
+    }
+
+    public void onInited(String[] args) {
+        room.sendCommand("g_participants", "start");
+        room.sendCommand("getpremium", "1");
+        room.sendCommand("blocklist", "block", "", "next", "500");
+        room.sendCommand("blocklist", "unblock", "", "next", "500");
+        room.getEventManager().callEvent(new ConnectEvent(room));
+    }
+
+    private Message parseMessage(String[] args) {
         StringBuilder builder = new StringBuilder();
         for(int i = 9; i < args.length; i++) {
             builder.append(":").append(args[i]);
@@ -56,21 +78,6 @@ public class RoomListener {
         String name = args[1].isEmpty() ? "Anon" + nTag : args[1];
 
         String text = rawMessage.replaceAll("<.*?>", "").replace("&lt", "<").replace("&gt", ">").replace("&quot", "\"").replace("&apos", "'").replace("&amp", "&");
-        Message message = new Message(text, Font.parseFont(font), new User(name));
-    }
-
-    public void onB(String[] args) {
-        // TODO: Call message event
-    }
-
-    public void onOk(String[] args) {
-        // TODO: Store moderators
-    }
-
-    public void onInited(String[] args) {
-        room.sendCommand("g_participants", "start");
-        room.sendCommand("getpremium", "1");
-        room.sendCommand("blocklist", "block", "", "next", "500");
-        room.sendCommand("blocklist", "unblock", "", "next", "500");
+        return new Message(text, Font.parseFont(font), new User(name));
     }
 }

@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.lenis0012</groupId>
-    <artifactId>Chatango-Bot</artifactId>
+    <groupId>com.lenis0012.chatango</groupId>
+    <artifactId>Chatango-API</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Chatango-Bot</name>
