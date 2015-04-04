@@ -161,7 +161,7 @@ public class Room extends Thread {
         String rawFont = Font.encodeFont(font);
         String rawColor = nameColor.encode();
         text = text.replace("\n", "</f></p><p>" + rawFont);
-        sendCommand("bmsg", "tl2r", rawColor + rawFont + text.replace("~", "&#126;"));
+        sendCommand("bm", "tl2j", "12", rawColor + rawFont + text.replace("~", "&#126;"));
     }
 
     protected void addUser(User user) {
