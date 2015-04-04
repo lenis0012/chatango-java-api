@@ -177,7 +177,7 @@ public class Room extends Thread {
     }
 
     public List<User> getUserList() {
-        return Collections.unmodifiableList(new ArrayList<>(userList));
+        return new ArrayList<>(userList);
     }
 
     protected void sendCommand(String... args) {
