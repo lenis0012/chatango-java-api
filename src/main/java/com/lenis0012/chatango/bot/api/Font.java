@@ -72,7 +72,7 @@ public class Font {
         try {
             type = FontType.values()[Integer.parseInt(components[1].replace("\"", ""))];
         } catch(NumberFormatException e) {}
-        
+
         return new Font(type, size, new RGBColor(color));
     }
 

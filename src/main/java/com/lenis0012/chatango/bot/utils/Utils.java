@@ -41,4 +41,14 @@ public class Utils {
         }
         return list;
     }
+
+    public static String pythToJav(String txt) {
+        for(int i = 0; i < txt.length(); i++) {
+            char c = txt.charAt(i);
+            if(c == '_' && txt.length() > i + 2) {
+                txt = txt.substring(0, i) + txt.substring(i + 1, i + 2).toUpperCase() + txt.substring(i + 2);
+            }
+        }
+        return txt;
+    }
 }

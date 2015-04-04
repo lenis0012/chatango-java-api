@@ -2,12 +2,14 @@ package com.lenis0012.chatango.bot.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import com.lenis0012.chatango.bot.ChatangoAPI;
 import com.lenis0012.chatango.bot.api.Font;
 import com.lenis0012.chatango.bot.api.Message;
 import com.lenis0012.chatango.bot.api.RGBColor;
+import com.lenis0012.chatango.bot.api.User;
 import com.lenis0012.chatango.bot.events.Event;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,11 +17,9 @@ import lombok.Setter;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -81,6 +81,7 @@ public class Room extends Thread {
     private byte[] cache = new byte[0];
 
     // Settings
+    private final Set<User> userList = Sets.newConcurrentHashSet();
     @Getter @Setter
     private Font defaultFont = Font.DEFAULT.clone();
     @Getter @Setter
@@ -159,7 +160,24 @@ public class Room extends Thread {
         Font font = message.getFont() == null ? defaultFont : message.getFont();
         String rawFont = Font.encodeFont(font);
         String rawColor = nameColor.encode();
-        sendCommand("bmsg", "tl2r", rawColor + rawFont + text);
+        text = text.replace("\n", "</f></p><p>" + rawFont);
+        sendCommand("bmsg", "tl2r", rawColor + rawFont + text.replace("~", "&#126;"));
+    }
+
+    protected void addUser(User user) {
+        userList.add(user);
+    }
+
+    protected void removeUser(User user) {
+        userList.remove(user);
+    }
+
+    public User findUser(String name) {
+        return userList.stream().filter(u -> u.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    public List<User> getUserList() {
+        return Collections.unmodifiableList(new ArrayList<>(userList));
     }
 
     protected void sendCommand(String... args) {

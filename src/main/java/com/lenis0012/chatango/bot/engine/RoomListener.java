@@ -1,14 +1,20 @@
 package com.lenis0012.chatango.bot.engine;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.lenis0012.chatango.bot.ChatangoAPI;
 import com.lenis0012.chatango.bot.api.Font;
 import com.lenis0012.chatango.bot.api.Message;
+import com.lenis0012.chatango.bot.api.RGBColor;
 import com.lenis0012.chatango.bot.api.User;
 import com.lenis0012.chatango.bot.events.ConnectEvent;
 import com.lenis0012.chatango.bot.events.MessageReceiveEvent;
+import com.lenis0012.chatango.bot.events.UserJoinEvent;
+import com.lenis0012.chatango.bot.events.UserLeaveEvent;
+import com.lenis0012.chatango.bot.utils.Utils;
 
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -33,7 +39,7 @@ public class RoomListener {
     public void execute(String cmd) {
         String name = cmd.split(":")[0];
         String[] args = cmd.contains(":") ? cmd.substring(name.length() + 1).split(":") : new String[0 ];
-        Method method = methods.get(name);
+        Method method = methods.get(Utils.pythToJav(name));
         if(method != null) {
             try {
                 method.invoke(this, (Object) args);
@@ -63,6 +69,48 @@ public class RoomListener {
         room.getEventManager().callEvent(new ConnectEvent(room));
     }
 
+    public void onGParticipants(String[] args) {
+        String rawArgs = Joiner.on(':').join(args);
+        String[] parts = rawArgs.split(";");
+        for(String data : parts) {
+            String[] subargs = data.split(":");
+            String name = subargs[3].toLowerCase();
+            if(name.equalsIgnoreCase("none")) {
+                continue;
+            }
+            User user = new User(subargs[0], name);
+            room.addUser(user);
+        }
+    }
+
+    public void onParticipant(String[] args) {
+        String name = args[3].toLowerCase();
+        if(name.equalsIgnoreCase("none")) {
+            return;
+        }
+        if(args[0].equalsIgnoreCase("0")) { // Leave
+            User user = room.findUser(name);
+            if(user != null) {
+                room.removeUser(user);
+                room.getEventManager().callEvent(new UserLeaveEvent(room, user));
+            }
+        } else { // Join
+            User user = new User(args[1], name);
+            if(room.getUserList().contains(user)) {
+                user = room.findUser(name);
+                user.setSessionId(args[1]);
+            } else {
+                room.addUser(user);
+                room.getEventManager().callEvent(new UserJoinEvent(room, user));
+            }
+        }
+    }
+
+    public void onN(String[] args) {
+        int count = new BigInteger(args[0], 16).intValue();
+        // TODO: User count change
+    }
+
     private Message parseMessage(String[] args) {
         StringBuilder builder = new StringBuilder();
         for(int i = 9; i < args.length; i++) {
@@ -71,13 +119,29 @@ public class RoomListener {
         String rawMessage = builder.toString().substring(1);
 
         // Find font and anon id
+        String name = args[1];
         Matcher fontMatcher = FONT_PATTERN.matcher(rawMessage);
         Matcher idMatcher = ID_PATTERN.matcher(rawMessage);
         String font = fontMatcher.find() ? fontMatcher.group(1).trim() : "";
         String nTag = idMatcher.find() ? idMatcher.group(1).trim() : "";
-        String name = args[1].isEmpty() ? "Anon" + nTag : args[1];
+        if(name.isEmpty()) {
+            name = "#" + args[2];
+            if(name.equals("#")) {
+                name = "!anon" + nTag;
+            }
+        }
+
+        User user = parseUser(name);
+        if(user.getSessionId() != "UNKNOWN") {
+            user.setNameColor(new RGBColor(nTag));
+        }
 
         String text = rawMessage.replaceAll("<.*?>", "").replace("&lt", "<").replace("&gt", ">").replace("&quot", "\"").replace("&apos", "'").replace("&amp", "&");
-        return new Message(text, Font.parseFont(font), new User(name));
+        return new Message(text, Font.parseFont(font), user);
+    }
+
+    private User parseUser(String name) {
+        User user = room.findUser(name);
+        return user == null ? new User("UNKNOWN", name) : user;
     }
 }
