@@ -6,10 +6,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import com.lenis0012.chatango.bot.ChatangoAPI;
-import com.lenis0012.chatango.bot.api.Font;
-import com.lenis0012.chatango.bot.api.Message;
-import com.lenis0012.chatango.bot.api.RGBColor;
-import com.lenis0012.chatango.bot.api.User;
+import com.lenis0012.chatango.bot.api.*;
 import com.lenis0012.chatango.bot.events.Event;
 import lombok.Getter;
 import lombok.Setter;
@@ -86,6 +83,8 @@ public class Room extends Thread {
     private Font defaultFont = Font.DEFAULT.clone();
     @Getter @Setter
     private RGBColor nameColor = new RGBColor("000");
+    private Channel channel = Channel.DEFAULT;
+    private Badge badge = Badge.NONE;
 
     protected Room(String name, Engine engine) throws IOException {
         this.name = name;
@@ -161,7 +160,7 @@ public class Room extends Thread {
         String rawFont = Font.encodeFont(font);
         String rawColor = nameColor.encode();
         text = text.replace("\n", "</f></p><p>" + rawFont);
-        sendCommand("bm", "tl2j", "12", rawColor + rawFont + text.replace("~", "&#126;"));
+        sendCommand("bm", "t12j", String.valueOf(12 + channel.getId() + badge.getId()), rawColor + rawFont + text.replace("~", "&#126;"));
     }
 
     protected void addUser(User user) {
@@ -178,6 +177,22 @@ public class Room extends Thread {
 
     public List<User> getUserList() {
         return new ArrayList<>(userList);
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+    public Badge getBadge() {
+        return badge;
+    }
+
+    public void setBadge(Badge badge) {
+        this.badge = badge;
     }
 
     protected void sendCommand(String... args) {

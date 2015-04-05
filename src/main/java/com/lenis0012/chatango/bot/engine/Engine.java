@@ -20,13 +20,15 @@ public class Engine {
     }
 
     public void start(List<String> roomNames) {
-        try {
-            Room room = new Room(roomNames.get(0), this);
-            rooms.put(room.getName(), room);
-            room.login();
-            room.start();
-        } catch(IOException e) {
-            ChatangoAPI.getLogger().log(Level.WARNING, "Failed to connect to room", e);
+        for(String roomName : roomNames) {
+            try {
+                Room room = new Room(roomName, this);
+                rooms.put(roomName, room);
+                room.login();
+                room.start();
+            } catch (IOException e) {
+                ChatangoAPI.getLogger().log(Level.WARNING, "Failed to connect to room", e);
+            }
         }
     }
 

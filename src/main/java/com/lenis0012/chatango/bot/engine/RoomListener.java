@@ -15,6 +15,7 @@ import com.lenis0012.chatango.bot.utils.Utils;
 
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
