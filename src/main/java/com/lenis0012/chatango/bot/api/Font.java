@@ -77,10 +77,7 @@ public class Font {
     }
 
     public static String encodeFont(Font font) {
-        StringBuilder builder = new StringBuilder("<f x");
-        builder.append(font.size).append(font.color.getRaw()); // Append size and color
-        builder.append("=\"").append(font.type.ordinal()).append("\">"); // Append type
-        return builder.toString();
+        return String.format("<f x%02d%s=\"%s\">", font.size, font.color.getRaw(), font.type.ordinal());
     }
 
     public static enum FontType {
