@@ -27,19 +27,16 @@ public class Room extends Thread {
     private static final List<Entry<String, Integer>> weights = Lists.newArrayList();
 
     static {
-        try {
-            JsonParser parser = new JsonParser();
-            JsonArray list = (JsonArray) parser.parse(new FileReader(new File("weights.json")));
-            for(int i = 0; i < list.size(); i++) {
-                JsonArray entry = list.get(i).getAsJsonArray();
-                weights.add(new SimpleEntry<>(entry.get(0).getAsString(), entry.get(1).getAsInt()));
-            }
-        } catch(FileNotFoundException e) {
-            throw new RuntimeException("Missing weights.json file (please add it to working dir)!");
+        JsonParser parser = new JsonParser();
+        JsonArray list = (JsonArray) parser.parse(new BufferedReader(new InputStreamReader(ChatangoAPI.class.getResourceAsStream("/weights.json"))));
+        for(int i = 0; i < list.size(); i++) {
+            JsonArray entry = list.get(i).getAsJsonArray();
+            weights.add(new SimpleEntry<>(entry.get(0).getAsString(), entry.get(1).getAsInt()));
         }
     }
 
     private static int getServerId(String name) {
+        name = name.toLowerCase().replaceAll("[^0-9a-z]", "q");
         float fnv = (float) new BigInteger(name.substring(0, Math.min(5, name.length())), 36).intValue();
         int lnv = 1000;
         if(name.length() > 6) {
@@ -62,12 +59,12 @@ public class Room extends Thread {
 
     private final String name;
     private final Engine engine;
+    private final RoomListener roomListener;
 
     // Connection fields
-    private final Socket socket;
-    private final OutputStream output;
-    private final InputStream input;
-    private final RoomListener roomListener;
+    private Socket socket;
+    private OutputStream output;
+    private InputStream input;
 
     // Misc
     @Getter
@@ -86,24 +83,37 @@ public class Room extends Thread {
     private Channel channel = Channel.DEFAULT;
     private Badge badge = Badge.NONE;
 
-    protected Room(String name, Engine engine) throws IOException {
+    private boolean connected = false;
+    private Thread pingThread = null;
+
+    protected Room(String name, Engine engine) {
         this.name = name;
         this.engine = engine;
-        this.socket = new Socket("s" + getServerId(name) + ".chatango.com", 443);
-        socket.setSoTimeout(40000);
-        this.output = socket.getOutputStream();
-        this.input = socket.getInputStream();
         this.roomListener = new RoomListener(this);
 
+        // Generate a UID with 16 characters
         Random random = new Random();
         while(uid.length() < 16) {
             uid += random.nextInt(10);
         }
     }
 
+    public String getRoomName() {
+        return name;
+    }
+
+    public void connect() throws IOException {
+        this.socket = new Socket("s" + getServerId(name) + ".chatango.com", 443);
+        socket.setSoTimeout(40000);
+        this.output = socket.getOutputStream();
+        this.input = socket.getInputStream();
+        this.connected = true;
+        start();
+    }
+
     @Override
     public void run() {
-        while(socket.isConnected()) {
+        while(connected) {
             try {
                 int len = input.read(BUFFER);
                 if(len > 0) {
@@ -132,6 +142,7 @@ public class Room extends Thread {
                 try {
                     socket.close();
                 } catch(IOException e1) {}
+                connected = false;
             }
         }
     }
@@ -139,10 +150,10 @@ public class Room extends Thread {
     protected void login() {
         sendCommand("bauth", name, uid, engine.getCredentials().getUsername(), engine.getCredentials().getPassword());
         // Constantly ping.
-        new Thread() {
+        this.pingThread = new Thread("Room Ping Thread") {
             @Override
             public void run() {
-                while(socket.isConnected()) {
+                while(connected) {
                     try {
                         Thread.sleep(20000L);
                     } catch(InterruptedException e) {
@@ -151,7 +162,8 @@ public class Room extends Thread {
                     sendCommand("");
                 }
             }
-        }.start();
+        };
+        pingThread.start();
     }
 
     public void message(Message message) {
@@ -195,8 +207,8 @@ public class Room extends Thread {
         this.badge = badge;
     }
 
-    protected void sendCommand(String... args) {
-        if(!socket.isConnected()) {
+    public void sendCommand(String... args) {
+        if(!connected) {
             return;
         }
 

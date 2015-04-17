@@ -1,5 +1,7 @@
 package com.lenis0012.chatango.bot.api;
 
+import com.lenis0012.chatango.bot.ChatangoAPI;
+
 public class Font {
     public static final Font DEFAULT = new Font(FontType.ARIAL, 12, new RGBColor("000"));
 
@@ -58,8 +60,14 @@ public class Font {
         String color = "000";
 
         // Parse size and color
-        if(sizecolor.length() > 2) {
-            if(sizecolor.length() > 3) {
+        if(sizecolor.length() > 5) {
+            color = sizecolor.substring(sizecolor.length() - 6);
+            color = String.valueOf(color.charAt(0)) + String.valueOf(color.charAt(2)) + String.valueOf(color.charAt(4));
+            if(sizecolor.length() > 6) {
+                size = Integer.parseInt(sizecolor.substring(0, sizecolor.length() - 6));
+            }
+        } else if(sizecolor.length() > 2) { //10aaa
+            if(sizecolor.length() > 3) { //
                 size = Integer.parseInt(sizecolor.substring(0, sizecolor.length() - 3)); // Has size
             }
             color = sizecolor.substring(sizecolor.length() - 3); // Has color

@@ -4,6 +4,7 @@ public class Message {
     private final String text;
     private Font font;
     private User user;
+    private String ipAddress;
 
     public Message(String message) {
         this(message, null);
@@ -37,5 +38,13 @@ public class Message {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
     }
 }

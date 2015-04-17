@@ -79,7 +79,7 @@ public class RoomListener {
             if(name.equalsIgnoreCase("none")) {
                 continue;
             }
-            User user = new User(subargs[0], name);
+            User user = new User(subargs[0], name, null);
             room.addUser(user);
         }
     }
@@ -96,7 +96,7 @@ public class RoomListener {
                 room.getEventManager().callEvent(new UserLeaveEvent(room, user));
             }
         } else { // Join
-            User user = new User(args[1], name);
+            User user = new User(args[1], name, null);
             if(room.getUserList().contains(user)) {
                 user = room.findUser(name);
                 user.setSessionId(args[1]);
@@ -133,16 +133,19 @@ public class RoomListener {
         }
 
         User user = parseUser(name);
+        user.setUid(args[3]);
         if(user.getSessionId() != "UNKNOWN") {
             user.setNameColor(new RGBColor(nTag));
         }
 
         String text = rawMessage.replaceAll("<.*?>", "").replace("&lt", "<").replace("&gt", ">").replace("&quot", "\"").replace("&apos", "'").replace("&amp", "&");
-        return new Message(text, Font.parseFont(font), user);
+        Message message = new Message(text, Font.parseFont(font), user);
+        message.setIpAddress(args[6]);
+        return message;
     }
 
     private User parseUser(String name) {
         User user = room.findUser(name);
-        return user == null ? new User("UNKNOWN", name) : user;
+        return user == null ? new User("UNKNOWN", name, null) : user;
     }
 }

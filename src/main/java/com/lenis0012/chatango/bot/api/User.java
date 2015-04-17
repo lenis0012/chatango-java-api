@@ -9,10 +9,19 @@ public class User {
     private String sessionId;
     private final String name;
     private RGBColor nameColor = new RGBColor("000");
+    private String uid;
 
-    public User(String sessionId, String name) {
+    public User(String sessionId, String name, String uid) {
         this.sessionId = sessionId;
         this.name = name;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     /**
