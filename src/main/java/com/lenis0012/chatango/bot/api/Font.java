@@ -72,7 +72,11 @@ public class Font {
             }
             color = sizecolor.substring(sizecolor.length() - 3); // Has color
         } else {
-            size = Integer.parseInt(sizecolor); // Only has size
+            try {
+                size = Integer.parseInt(sizecolor); // Only has size
+            } catch(NumberFormatException e) {
+                size = 12; // default to 12
+            }
         }
 
         // Parse font

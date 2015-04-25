@@ -138,7 +138,7 @@ public class RoomListener {
             user.setNameColor(new RGBColor(nTag));
         }
 
-        String text = rawMessage.replaceAll("<.*?>", "").replace("&lt", "<").replace("&gt", ">").replace("&quot", "\"").replace("&apos", "'").replace("&amp", "&");
+        String text = rawMessage.replaceAll("<.*?>", "").replace("&lt", "<").replace("&gt", ">").replace("&quot", "\"").replace("&apos", "'").replace("&amp", "&").replace("<;", "<").replace(">;", ">");
         Message message = new Message(text, Font.parseFont(font), user);
         message.setIpAddress(args[6]);
         return message;

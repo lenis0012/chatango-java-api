@@ -1,19 +1,68 @@
 package com.lenis0012.chatango.bot.api;
 
 import com.google.common.collect.Sets;
+import com.lenis0012.chatango.bot.utils.Utils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.BufferedInputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
 public class User {
+    private static String PROFILE_URL = "http://ust.chatango.com/profileimg/%s/%s/%s/mod1.xml";
     private final Set<String> tags = Sets.newConcurrentHashSet();
     private String sessionId;
     private final String name;
     private RGBColor nameColor = new RGBColor("000");
     private String uid;
 
-    public User(String sessionId, String name, String uid) {
+    private String gender = "?";
+    private Date birth = null;
+    private String country = "?";
+
+    public User(final String sessionId, final String name, String uid) {
         this.sessionId = sessionId;
         this.name = name;
+        this.uid = uid;
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(Utils.formatUrl(PROFILE_URL, name.substring(0, 1), name.substring(1, 2), name));
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder builder = dbf.newDocumentBuilder();
+                    Document document = builder.parse(new BufferedInputStream(url.openStream()));
+                    Element root = document.getDocumentElement();
+                    if(root.getElementsByTagName("s").getLength() > 0) {
+                        gender = root.getElementsByTagName("s").item(0).getTextContent();
+                    } if(root.getElementsByTagName("b").getLength() > 0) {
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                        birth = format.parse(root.getElementsByTagName("b").item(0).getTextContent());
+                    } if(root.getElementsByTagName("l").getLength() > 0) {
+                        country = root.getElementsByTagName("l").item(0).getTextContent();
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }.start();
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public Date getBirth() {
+        return birth;
+    }
+
+    public String getCountry() {
+        return country;
     }
 
     public String getUid() {
