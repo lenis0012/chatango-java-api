@@ -47,6 +47,13 @@
             <version>2.1</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Websocket API -->
+        <dependency>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>websocket-client</artifactId>
+            <version>9.3.0.M2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,29 +1,21 @@
 package com.lenis0012.chatango.bot.engine;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import com.lenis0012.chatango.bot.ChatangoAPI;
 import com.lenis0012.chatango.bot.api.*;
-import com.lenis0012.chatango.bot.events.Event;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.net.Socket;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
 
-public class Room extends Thread {
-    private static final char END_CHAR = (char) 0x00;
-    private static final byte[] BUFFER = new byte[1024];
+public class Room extends Codec {
     private static final List<Entry<String, Integer>> weights = Lists.newArrayList();
 
     static {
@@ -61,18 +53,10 @@ public class Room extends Thread {
     private final Engine engine;
     private final RoomListener roomListener;
 
-    // Connection fields
-    private Socket socket;
-    private OutputStream output;
-    private InputStream input;
-
     // Misc
     @Getter
     private final EventManager eventManager = new EventManager();
-    private final Lock writeLock = new ReentrantLock();
-    private boolean firstCommand = true;
     private String uid = "";
-    private byte[] cache = new byte[0];
 
     // Settings
     private final Set<User> userList = Sets.newConcurrentHashSet();
@@ -83,10 +67,8 @@ public class Room extends Thread {
     private Channel channel = Channel.DEFAULT;
     private Badge badge = Badge.NONE;
 
-    private boolean connected = false;
-    private Thread pingThread = null;
-
     protected Room(String name, Engine engine) {
+        super();
         this.name = name;
         this.engine = engine;
         this.roomListener = new RoomListener(this);
@@ -103,67 +85,18 @@ public class Room extends Thread {
     }
 
     public void connect() throws IOException {
-        this.socket = new Socket("s" + getServerId(name) + ".chatango.com", 443);
-        socket.setSoTimeout(40000);
-        this.output = socket.getOutputStream();
-        this.input = socket.getInputStream();
-        this.connected = true;
-        start();
+        String host = String.format("s%s.chatango.com", getServerId(name));
+        int port = 443;
+        connect(host, port);
     }
 
     @Override
-    public void run() {
-        while(connected) {
-            try {
-                int len = input.read(BUFFER);
-                if(len > 0) {
-                    int start = 0;
-                    // Scan through bytes to find new commands
-                    for(int i = 0; i < len; i++) {
-                        if(BUFFER[i] == END_CHAR) {
-                            // Add previous cache if remaining
-                            byte[] bytes = new byte[cache.length + (i - start)];
-                            System.arraycopy(cache, 0, bytes, 0, cache.length);
-                            System.arraycopy(BUFFER, start, bytes, cache.length, i - start);
-                            roomListener.execute(new String(bytes));
-                            this.cache = new byte[0];
-                            start = i + 1;
-                        }
-                    }
-
-                    // Add remainder to cache
-                    byte[] newCache = new byte[cache.length + (len - start)];
-                    System.arraycopy(cache, 0, newCache, 0, cache.length);
-                    System.arraycopy(BUFFER, start, newCache, cache.length, len - start);
-                    this.cache = newCache;
-                }
-            } catch(IOException e) {
-                ChatangoAPI.getLogger().log(Level.WARNING, "Failed to read bytes, closing socket!");
-                try {
-                    socket.close();
-                } catch(IOException e1) {}
-                connected = false;
-            }
-        }
+    public void onMessageReceive(String message) {
+        roomListener.execute(message);
     }
 
     protected void login() {
         sendCommand("bauth", name, uid, engine.getCredentials().getUsername(), engine.getCredentials().getPassword());
-        // Constantly ping.
-        this.pingThread = new Thread("Room Ping Thread") {
-            @Override
-            public void run() {
-                while(connected) {
-                    try {
-                        Thread.sleep(20000L);
-                    } catch(InterruptedException e) {
-                        // Ignore
-                    }
-                    sendCommand("");
-                }
-            }
-        };
-        pingThread.start();
     }
 
     public void message(Message message) {
@@ -205,28 +138,5 @@ public class Room extends Thread {
 
     public void setBadge(Badge badge) {
         this.badge = badge;
-    }
-
-    public void sendCommand(String... args) {
-        if(!connected) {
-            return;
-        }
-
-        String command = Joiner.on(':').join(args);
-        command = firstCommand ? command : command + "\r\n";
-        this.firstCommand = false;
-        writeLock.lock();
-        try {
-            output.write(command.getBytes());
-            output.write(0x00);
-            output.flush();
-        } catch(IOException e) {
-            ChatangoAPI.getLogger().log(Level.SEVERE, "Error occurred while sending command, closing socket!", e);
-            try {
-                socket.close();
-            } catch(IOException e1) {}
-        } finally {
-            writeLock.unlock();
-        }
     }
 }

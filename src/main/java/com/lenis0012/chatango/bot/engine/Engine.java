@@ -12,6 +12,7 @@ import java.util.logging.Level;
 
 public class Engine {
     private final Map<String, Room> rooms = Maps.newConcurrentMap();
+    private PMManager pmManager;
     private Credentials credentials;
 
     public void authenticate(String username, String password) {
@@ -20,6 +21,7 @@ public class Engine {
     }
 
     public void start(List<String> roomNames) {
+        this.pmManager = new PMManager(this);
         for(String roomName : roomNames) {
             try {
                 Room room = new Room(roomName, this);
@@ -42,5 +44,9 @@ public class Engine {
 
     public Room getRoom(String name) {
         return rooms.get(name);
+    }
+
+    public PMManager getPmManager() {
+        return pmManager;
     }
 }

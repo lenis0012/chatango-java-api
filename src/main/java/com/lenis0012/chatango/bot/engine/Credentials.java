@@ -25,6 +25,10 @@ public class Credentials {
         try {
             URL url = new URL(Utils.formatUrl(LOGIN_URL, username, password));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            if(connection.getResponseCode() != 200) {
+                return false;
+            }
+
             Optional<String> authKey = connection.getHeaderFields().get("Set-Cookie").stream().filter(s -> s.startsWith("auth.chatango.com")).map(s -> s.split(";")[0].substring("auth.chatango.com=".length())).findFirst();
             if(authKey.isPresent() && !authKey.get().isEmpty()) {
                 this.authKey = authKey.get();
