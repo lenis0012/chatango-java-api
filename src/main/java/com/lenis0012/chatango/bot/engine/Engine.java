@@ -28,7 +28,7 @@ public class Engine {
                 rooms.put(roomName, room);
                 room.connect();
                 room.login();
-            } catch (IOException e) {
+            } catch(IOException e) {
                 ChatangoAPI.getLogger().log(Level.WARNING, "Failed to connect to room", e);
             }
         }

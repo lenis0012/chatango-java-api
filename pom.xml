@@ -48,13 +48,6 @@
             <scope>compile</scope>
         </dependency>
         <!-- Websocket API -->
-        <!--<dependency>-->
-            <!--<groupId>org.java_websocket</groupId>-->
-            <!--<artifactId>Java-WebSocket</artifactId>-->
-            <!--<version>1.2.1-SNAPSHOT</version>-->
-            <!--<scope>system</scope>-->
-            <!--<systemPath>${project.basedir}/lib/java_websocket.jar</systemPath>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>javax.websocket</groupId>
             <artifactId>javax.websocket-api</artifactId>
@@ -126,13 +119,12 @@
                                     <include>org.apache.logging.log4j:log4j-core</include>
                                     <include>org.apache.logging.log4j:log4j-api</include>
                                     <include>net.sf.trove4j:trove4j</include>
-                                    <include>org.java_websocket:Java-WebSocket</include>
-                                    <!--<include>javax.websocket:javax.websocket-api</include>-->
-                                    <!--<include>org.eclipse.jetty.websocket:websocket-api</include>-->
-                                    <!--<include>org.eclipse.jetty.websocket:websocket-common</include>-->
-                                    <!--<include>org.eclipse.jetty:jetty-util</include>-->
-                                    <!--<include>org.eclipse.jetty:jetty-io</include>-->
-                                    <!--<include>org.eclipse.jetty.websocket:websocket-client</include>-->
+                                    <include>javax.websocket:javax.websocket-api</include>
+                                    <include>org.eclipse.jetty.websocket:websocket-api</include>
+                                    <include>org.eclipse.jetty.websocket:websocket-common</include>
+                                    <include>org.eclipse.jetty:jetty-util</include>
+                                    <include>org.eclipse.jetty:jetty-io</include>
+                                    <include>org.eclipse.jetty.websocket:websocket-client</include>
                                 </includes>
                             </artifactSet>
                         </configuration>

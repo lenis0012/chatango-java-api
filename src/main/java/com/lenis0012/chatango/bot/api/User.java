@@ -9,7 +9,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedInputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
@@ -41,13 +40,15 @@ public class User {
                     Element root = document.getDocumentElement();
                     if(root.getElementsByTagName("s").getLength() > 0) {
                         gender = root.getElementsByTagName("s").item(0).getTextContent();
-                    } if(root.getElementsByTagName("b").getLength() > 0) {
+                    }
+                    if(root.getElementsByTagName("b").getLength() > 0) {
                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                         birth = format.parse(root.getElementsByTagName("b").item(0).getTextContent());
-                    } if(root.getElementsByTagName("l").getLength() > 0) {
+                    }
+                    if(root.getElementsByTagName("l").getLength() > 0) {
                         country = root.getElementsByTagName("l").item(0).getTextContent();
                     }
-                } catch (Exception e) {
+                } catch(Exception e) {
                 }
             }
         }.start();

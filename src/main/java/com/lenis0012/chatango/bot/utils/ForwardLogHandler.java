@@ -42,8 +42,10 @@ public class ForwardLogHandler extends ConsoleHandler {
     }
 
     @Override
-    public void flush() {}
+    public void flush() {
+    }
 
     @Override
-    public void close() throws SecurityException {}
+    public void close() throws SecurityException {
+    }
 }

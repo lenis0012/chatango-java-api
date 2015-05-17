@@ -1,7 +1,5 @@
 package com.lenis0012.chatango.bot.api;
 
-import com.lenis0012.chatango.bot.ChatangoAPI;
-
 public class Font {
     public static final Font DEFAULT = new Font(FontType.ARIAL, 12, new RGBColor("000"));
 
@@ -83,7 +81,8 @@ public class Font {
         FontType type = FontType.ARIAL;
         try {
             type = FontType.values()[Integer.parseInt(components[1].replace("\"", ""))];
-        } catch(NumberFormatException e) {}
+        } catch(NumberFormatException e) {
+        }
 
         return new Font(type, size, new RGBColor(color));
     }

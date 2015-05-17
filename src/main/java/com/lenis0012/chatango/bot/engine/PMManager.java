@@ -8,7 +8,6 @@ import com.lenis0012.chatango.bot.api.Friend;
 import com.lenis0012.chatango.bot.events.pm.PMMessageEvent;
 import com.lenis0012.chatango.bot.events.pm.PMTrackEvent;
 import lombok.SneakyThrows;
-import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
 import java.lang.reflect.Method;

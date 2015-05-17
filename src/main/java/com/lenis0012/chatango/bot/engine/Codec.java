@@ -10,9 +10,6 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Executors;
@@ -90,7 +87,8 @@ public abstract class Codec {
         }
     }
 
-    public void onConnect() {}
+    public void onConnect() {
+    }
 
     public abstract void onMessageReceive(String message);
 

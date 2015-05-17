@@ -9,11 +9,16 @@ import com.lenis0012.chatango.bot.api.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
 
 public class Room extends Codec {
     private static final List<Entry<String, Integer>> weights = Lists.newArrayList();
@@ -35,7 +40,7 @@ public class Room extends Codec {
             lnv = new BigInteger(name.substring(6, 6 + Math.min(3, name.length() - 5)), 36).intValue();
             lnv = Math.max(lnv, 1000);
         }
-        float num =  (fnv % lnv) / lnv;
+        float num = (fnv % lnv) / lnv;
         int maxnum = weights.stream().mapToInt(Entry::getValue).sum();
         float sumfreq = 0;
         int sn = 0;
@@ -60,9 +65,11 @@ public class Room extends Codec {
 
     // Settings
     private final Set<User> userList = Sets.newConcurrentHashSet();
-    @Getter @Setter
+    @Getter
+    @Setter
     private Font defaultFont = Font.DEFAULT.clone();
-    @Getter @Setter
+    @Getter
+    @Setter
     private RGBColor nameColor = new RGBColor("000");
     private Channel channel = Channel.DEFAULT;
     private Badge badge = Badge.NONE;

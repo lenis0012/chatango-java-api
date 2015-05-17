@@ -49,7 +49,7 @@ public class JsonConfig {
     /**
      * Set a value is json object
      *
-     * @param key Path and key (destination) of the value
+     * @param key   Path and key (destination) of the value
      * @param value The value
      */
     public void set(String key, Object value) {

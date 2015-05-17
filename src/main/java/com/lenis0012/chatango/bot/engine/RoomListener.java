@@ -15,7 +15,6 @@ import com.lenis0012.chatango.bot.utils.Utils;
 
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -39,7 +38,7 @@ public class RoomListener {
 
     public void execute(String cmd) {
         String name = cmd.split(":")[0];
-        String[] args = cmd.contains(":") ? cmd.substring(name.length() + 1).split(":") : new String[0 ];
+        String[] args = cmd.contains(":") ? cmd.substring(name.length() + 1).split(":") : new String[0];
         Method method = methods.get(Utils.pythToJav(name));
         if(method != null) {
             try {
