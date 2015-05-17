@@ -86,7 +86,7 @@ public class Room extends Codec {
 
     public void connect() throws IOException {
         String host = String.format("s%s.chatango.com", getServerId(name));
-        int port = 443;
+        int port = 8080;
         connect(host, port);
     }
 

@@ -8,6 +8,7 @@ import com.lenis0012.chatango.bot.api.Friend;
 import com.lenis0012.chatango.bot.events.pm.PMMessageEvent;
 import com.lenis0012.chatango.bot.events.pm.PMTrackEvent;
 import lombok.SneakyThrows;
+import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -36,11 +37,15 @@ public class PMManager extends Codec {
 
     public void connect() {
         try {
-            connect("c1.chatango.com", 5222);
-            sendCommand("tlogin", engine.getCredentials().getAuthKey(), "2");
+            connect("c1.chatango.com", 8080);
         } catch(IOException e) {
             ChatangoAPI.getLogger().log(Level.WARNING, "Failed to connect to PM server", e);
         }
+    }
+
+    @Override
+    public void onConnect() {
+        sendCommand("tlogin", engine.getCredentials().getAuthKey(), "2");
     }
 
     @Override
