@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
-public class Room extends Codec {
+public class Room extends WSCodec {
     private static final List<Entry<String, Integer>> weights = Lists.newArrayList();
 
     static {
@@ -73,6 +73,8 @@ public class Room extends Codec {
     private RGBColor nameColor = new RGBColor("000");
     private Channel channel = Channel.DEFAULT;
     private Badge badge = Badge.NONE;
+    private boolean bgEnabled;
+    private boolean premium;
 
     protected Room(String name, Engine engine) {
         super();
@@ -93,6 +95,7 @@ public class Room extends Codec {
 
     public void connect() throws IOException {
         String host = String.format("s%s.chatango.com", getServerId(name));
+        System.out.println(host);
         int port = 8080;
         connect(host, port);
     }
@@ -107,8 +110,15 @@ public class Room extends Codec {
     }
 
     public void message(Message message) {
-        String text = message.getText();
+        String text = message.getText().replace("\n", "<br />");
         Font font = message.getFont() == null ? defaultFont : message.getFont();
+        if(font.isBold()) {
+            text = "<b>" + text + "</b>";
+        } if(font.isUnderlined()) {
+            text = "<u>" + text + "</u>";
+        } if(font.isItalic()) {
+            text = "<i>" + text + "</i>";
+        }
         String rawFont = Font.encodeFont(font);
         String rawColor = nameColor.encode();
         text = text.replace("\n", "</f></p><p>" + rawFont);
@@ -116,6 +126,7 @@ public class Room extends Codec {
     }
 
     protected void addUser(User user) {
+        if(userList.contains(user)) return;
         userList.add(user);
     }
 
@@ -145,5 +156,28 @@ public class Room extends Codec {
 
     public void setBadge(Badge badge) {
         this.badge = badge;
+    }
+
+    public boolean isBgEnabled() {
+        return bgEnabled;
+    }
+
+    public boolean isPremium() {
+        return premium;
+    }
+
+    public void setBgEnabled(boolean bgEnabled) {
+        this.bgEnabled = bgEnabled;
+        if(isPremium()) {
+            sendCommand("msgbg", bgEnabled ? "1" : "0");
+        }
+    }
+
+    protected Engine getEngine() {
+        return engine;
+    }
+
+    void setPremium(boolean premium) {
+        this.premium = premium;
     }
 }

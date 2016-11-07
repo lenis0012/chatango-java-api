@@ -33,14 +33,13 @@ public class ChatangoAPI {
         logger.addHandler(new ForwardLogHandler());
     }
 
-    public static Engine startBot(String username, String password, List<String> rooms) throws AuthException {
+    public static Engine createBot(String username, String password) throws AuthException {
         Engine engine = new Engine();
         engine.authenticate(username, password);
         if(!engine.getCredentials().isAuthenticated()) {
             throw new AuthException("Invalid credentials!");
         }
 
-        engine.start(rooms);
         return engine;
     }
 

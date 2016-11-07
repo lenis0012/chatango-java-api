@@ -7,6 +7,10 @@ public class Font {
     private int size;
     private RGBColor color;
 
+    private boolean bold;
+    private boolean underlined;
+    private boolean italic;
+
     public Font(FontType type) {
         this(type, 12);
     }
@@ -89,6 +93,30 @@ public class Font {
 
     public static String encodeFont(Font font) {
         return String.format("<f x%02d%s=\"%s\">", font.size, font.color.getRaw(), font.type.ordinal());
+    }
+
+    public boolean isBold() {
+        return bold;
+    }
+
+    public void setBold(boolean bold) {
+        this.bold = bold;
+    }
+
+    public boolean isUnderlined() {
+        return underlined;
+    }
+
+    public void setUnderlined(boolean underlined) {
+        this.underlined = underlined;
+    }
+
+    public boolean isItalic() {
+        return italic;
+    }
+
+    public void setItalic(boolean italic) {
+        this.italic = italic;
     }
 
     public static enum FontType {

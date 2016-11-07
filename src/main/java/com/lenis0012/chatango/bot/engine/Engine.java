@@ -20,12 +20,17 @@ public class Engine {
         credentials.authenticate();
     }
 
-    public void start(List<String> roomNames) {
+    public void init(List<String> roomNames) {
         this.pmManager = new PMManager(this);
         for(String roomName : roomNames) {
+            Room room = new Room(roomName, this);
+            rooms.put(roomName, room);
+        }
+    }
+
+    public void start() {
+        for(Room room : rooms.values()) {
             try {
-                Room room = new Room(roomName, this);
-                rooms.put(roomName, room);
                 room.connect();
                 room.login();
             } catch(IOException e) {

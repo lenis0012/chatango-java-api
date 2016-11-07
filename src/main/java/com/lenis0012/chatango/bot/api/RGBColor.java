@@ -5,7 +5,7 @@ public class RGBColor {
 
     public RGBColor(String handle) {
         this();
-        setRaw("000");
+        setRaw(handle);
     }
 
     public RGBColor() {

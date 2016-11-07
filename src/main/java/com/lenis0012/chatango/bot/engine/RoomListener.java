@@ -69,6 +69,15 @@ public class RoomListener {
         room.getEventManager().callEvent(new ConnectEvent(room));
     }
 
+    public void onPremium(String[] args) {
+        long expiry = Long.parseLong(args[1]);
+        long current = System.currentTimeMillis() / 1000;
+        room.setPremium(expiry > current);
+        if(room.isBgEnabled()) {
+            room.sendCommand("msgbg", "1");
+        }
+    }
+
     public void onGParticipants(String[] args) {
         String rawArgs = Joiner.on(':').join(args);
         String[] parts = rawArgs.split(";");

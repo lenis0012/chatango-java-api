@@ -63,6 +63,9 @@ public class Friend {
     public BufferedImage getAvatar() {
         if(avatar != null) {
             return avatar;
+        } else if(name.length() < 2) {
+            this.avatar = new BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB);
+            return avatar;
         }
 
         try {

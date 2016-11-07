@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.lenis0012.chatango.bot.ChatangoAPI;
 import com.lenis0012.chatango.bot.api.Friend;
+import com.lenis0012.chatango.bot.events.pm.PMFriendAddedEvent;
 import com.lenis0012.chatango.bot.events.pm.PMMessageEvent;
 import com.lenis0012.chatango.bot.events.pm.PMTrackEvent;
 import lombok.SneakyThrows;
@@ -15,12 +16,13 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
-public class PMManager extends Codec {
+public class PMManager extends SCodec {
     private final Map<String, Method> methods = Maps.newHashMap();
     private final Map<String, Set<Consumer<String[]>>> events = Maps.newConcurrentMap();
     private final List<Friend> friendList = Collections.synchronizedList(Lists.newArrayList());
     private final Engine engine;
     private Consumer<PMMessageEvent> onMessage;
+    private Consumer<PMFriendAddedEvent> onFriendAdd;
     private Runnable onConnect;
 
     public PMManager(Engine engine) {
@@ -36,7 +38,7 @@ public class PMManager extends Codec {
 
     public void connect() {
         try {
-            connect("c1.chatango.com", 8080);
+            connect("c1.chatango.com", 5222);
         } catch(IOException e) {
             ChatangoAPI.getLogger().log(Level.WARNING, "Failed to connect to PM server", e);
         }
@@ -91,6 +93,10 @@ public class PMManager extends Codec {
         this.onConnect = consumer;
     }
 
+    public void onFriendAdd(Consumer<PMFriendAddedEvent> consumer) {
+        this.onFriendAdd = consumer;
+    }
+
     public void track(String user, Consumer<PMTrackEvent> ev) {
         sendCommand("track", user);
         addConsumer("track", args -> {
@@ -126,6 +132,18 @@ public class PMManager extends Codec {
 
     private void onMsgOff(String[] args) {
         parseMessage(args);
+    }
+
+    private void onWlAdd(String[] args) {
+        String name = args[0];
+        boolean online = "on".equals(args[1]);
+        int idle = online ? Integer.parseInt(args[2]) : 0;
+        long lastOnline = online ? System.currentTimeMillis() / 1000 : Long.parseLong(args[2]);
+        Friend friend = new Friend(name, online, idle, lastOnline);
+        friendList.add(new Friend(name, online, idle, lastOnline));
+        if(onFriendAdd != null) {
+            onFriendAdd.accept(new PMFriendAddedEvent(friend));
+        }
     }
 
     protected void parseMessage(String[] args) {
