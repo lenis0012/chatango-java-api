@@ -37,7 +37,7 @@ public class Room extends WSCodec {
         float fnv = (float) new BigInteger(name.substring(0, Math.min(5, name.length())), 36).intValue();
         int lnv = 1000;
         if(name.length() > 6) {
-            lnv = new BigInteger(name.substring(6, 6 + Math.min(3, name.length() - 5)), 36).intValue();
+            lnv = new BigInteger(name.substring(6, 6 + Math.min(3, name.length() - 6)), 36).intValue();
             lnv = Math.max(lnv, 1000);
         }
         float num = (fnv % lnv) / lnv;
