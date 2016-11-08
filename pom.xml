@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.lenis0012.chatango</groupId>
-    <artifactId>Chatango-API</artifactId>
-    <version>1.1</version>
+    <artifactId>chatango-java-api</artifactId>
+    <version>2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Chatango-Bot</name>
+    <name>Chatango-Java-API</name>
 
     <dependencies>
         <!-- Dependency Injection -->
