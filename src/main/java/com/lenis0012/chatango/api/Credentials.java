@@ -6,6 +6,7 @@ package com.lenis0012.chatango.api;
 public class Credentials {
     private final String username;
     private final String password;
+    private String authKey = null;
 
     /**
      * Constructs new credentials with username & password authentication.
@@ -34,5 +35,14 @@ public class Credentials {
      */
     public String getPassword() {
         return password;
+    }
+
+    public String authKey() {
+        return authKey;
+    }
+
+    public Credentials authKey(String authKey) {
+        this.authKey = authKey;
+        return this;
     }
 }
