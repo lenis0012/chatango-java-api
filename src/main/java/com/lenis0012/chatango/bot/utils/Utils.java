@@ -1,11 +1,11 @@
 package com.lenis0012.chatango.bot.utils;
 
-import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import lombok.SneakyThrows;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
@@ -35,7 +35,7 @@ public class Utils {
     }
 
     public static <T> List<T> convertList(JsonArray from, Class<T> type) {
-        List<T> list = Lists.newArrayList();
+        List<T> list = new ArrayList<>();
         for(int i = 0; i < from.size(); i++) {
             list.add(type.cast(from.get(i).getAsString()));
         }

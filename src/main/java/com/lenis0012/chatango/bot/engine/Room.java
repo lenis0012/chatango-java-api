@@ -1,7 +1,5 @@
 package com.lenis0012.chatango.bot.engine;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import com.lenis0012.chatango.bot.ChatangoAPI;
@@ -13,15 +11,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Room extends WSCodec {
-    private static final List<Entry<String, Integer>> weights = Lists.newArrayList();
+    private static final List<Entry<String, Integer>> weights = new ArrayList<>();
 
     static {
         JsonParser parser = new JsonParser();
@@ -64,7 +60,7 @@ public class Room extends WSCodec {
     private String uid = "";
 
     // Settings
-    private final Set<User> userList = Sets.newConcurrentHashSet();
+    private final Set<User> userList = Collections.newSetFromMap(new ConcurrentHashMap<>());
     @Getter
     @Setter
     private Font defaultFont = Font.DEFAULT.clone();

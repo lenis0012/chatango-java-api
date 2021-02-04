@@ -1,6 +1,5 @@
 package com.lenis0012.chatango.bot.utils;
 
-import com.google.common.collect.Sets;
 import com.google.gson.*;
 
 import java.io.File;
@@ -8,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -147,7 +147,7 @@ public class JsonConfig {
      */
     public Set<String> keys(String path) {
         JsonObject current = getObject(path, false);
-        Set<String> set = Sets.newHashSet();
+        Set<String> set = new HashSet<>();
         for(Entry<String, JsonElement> entry : current.entrySet()) {
             set.add(entry.getKey());
         }

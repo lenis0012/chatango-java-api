@@ -1,16 +1,15 @@
 package com.lenis0012.chatango.bot.api;
 
-import com.google.common.collect.Lists;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Friend {
-    private final List<String> messages = Collections.synchronizedList(Lists.newArrayList());
+    private final List<String> messages = Collections.synchronizedList(new ArrayList<>());
     private final String name;
     private boolean online;
     private int idle;

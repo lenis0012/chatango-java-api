@@ -1,6 +1,5 @@
 package com.lenis0012.chatango.bot.engine;
 
-import com.google.common.base.Joiner;
 import com.lenis0012.chatango.bot.ChatangoAPI;
 
 import java.io.IOException;
@@ -14,6 +13,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
+@Deprecated
 public abstract class SCodec extends Thread implements Codec {
     private static final char END_CHAR = (char) 0x00;
     private static final byte[] BUFFER = new byte[1024];
@@ -88,7 +88,7 @@ public abstract class SCodec extends Thread implements Codec {
             return;
         }
 
-        String command = Joiner.on(':').join(args);
+        String command = String.join(":", args);
         command = firstCommand ? command : command + "\r\n";
         this.firstCommand = false;
         writeLock.lock();

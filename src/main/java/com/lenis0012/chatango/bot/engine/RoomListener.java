@@ -1,7 +1,5 @@
 package com.lenis0012.chatango.bot.engine;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Maps;
 import com.lenis0012.chatango.bot.ChatangoAPI;
 import com.lenis0012.chatango.bot.api.Font;
 import com.lenis0012.chatango.bot.api.Message;
@@ -16,6 +14,7 @@ import com.lenis0012.chatango.bot.utils.Utils;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +23,7 @@ public class RoomListener {
     private static final Pattern ID_PATTERN = Pattern.compile("<n(.*?)/>");
     private static final Pattern FONT_PATTERN = Pattern.compile("<f(.*?)>");
 
-    private final Map<String, Method> methods = Maps.newConcurrentMap();
+    private final Map<String, Method> methods = new ConcurrentHashMap<>();
     private final Room room;
 
     public RoomListener(Room room) {
@@ -79,7 +78,7 @@ public class RoomListener {
     }
 
     public void onGParticipants(String[] args) {
-        String rawArgs = Joiner.on(':').join(args);
+        String rawArgs = String.join(":", args);
         String[] parts = rawArgs.split(";");
         for(String data : parts) {
             String[] subargs = data.split(":");

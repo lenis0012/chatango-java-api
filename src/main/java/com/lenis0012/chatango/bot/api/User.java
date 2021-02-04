@@ -1,6 +1,5 @@
 package com.lenis0012.chatango.bot.api;
 
-import com.google.common.collect.Sets;
 import com.lenis0012.chatango.bot.utils.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -10,12 +9,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedInputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class User {
     private static String PROFILE_URL = "http://ust.chatango.com/profileimg/%s/%s/%s/mod1.xml";
-    private final Set<String> tags = Sets.newConcurrentHashSet();
+    private final Set<String> tags = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private String sessionId;
     private final String name;
     private RGBColor nameColor = new RGBColor("000");

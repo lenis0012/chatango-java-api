@@ -1,8 +1,5 @@
 package com.lenis0012.chatango.bot.engine;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.lenis0012.chatango.bot.ChatangoAPI;
 import com.lenis0012.chatango.bot.api.Friend;
 import com.lenis0012.chatango.bot.events.pm.PMFriendAddedEvent;
@@ -13,13 +10,14 @@ import lombok.SneakyThrows;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class PMManager extends SCodec {
-    private final Map<String, Method> methods = Maps.newHashMap();
-    private final Map<String, Set<Consumer<String[]>>> events = Maps.newConcurrentMap();
-    private final List<Friend> friendList = Collections.synchronizedList(Lists.newArrayList());
+    private final Map<String, Method> methods = new HashMap<>();
+    private final Map<String, Set<Consumer<String[]>>> events = new ConcurrentHashMap<>();
+    private final List<Friend> friendList = Collections.synchronizedList(new ArrayList<>());
     private final Engine engine;
     private Consumer<PMMessageEvent> onMessage;
     private Consumer<PMFriendAddedEvent> onFriendAdd;
@@ -166,7 +164,7 @@ public class PMManager extends SCodec {
     private void addConsumer(String cmd, Consumer<String[]> ev) {
         Set<Consumer<String[]>> set = events.get(cmd);
         if(set == null) {
-            set = Sets.newConcurrentHashSet();
+            set = Collections.newSetFromMap(new ConcurrentHashMap<>());
             events.put(cmd, set);
         }
 

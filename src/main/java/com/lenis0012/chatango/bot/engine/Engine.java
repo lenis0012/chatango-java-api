@@ -1,6 +1,5 @@
 package com.lenis0012.chatango.bot.engine;
 
-import com.google.common.collect.Maps;
 import com.lenis0012.chatango.bot.ChatangoAPI;
 
 import java.io.IOException;
@@ -8,10 +7,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 public class Engine {
-    private final Map<String, Room> rooms = Maps.newConcurrentMap();
+    private final Map<String, Room> rooms = new ConcurrentHashMap<>();
     private PMManager pmManager;
     private Credentials credentials;
 

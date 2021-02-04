@@ -1,6 +1,5 @@
 package com.lenis0012.chatango.bot.engine;
 
-import com.google.common.base.Joiner;
 import com.lenis0012.chatango.bot.ChatangoAPI;
 import lombok.SneakyThrows;
 import org.eclipse.jetty.websocket.api.Session;
@@ -71,7 +70,7 @@ public abstract class WSCodec implements Codec {
             return;
         }
 
-        String command = Joiner.on(':').join(args);
+        String command = String.join(":", args);
         writeLock.lock();
         command = firstCommand ? command : command + "\r\n";
         try {
