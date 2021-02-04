@@ -22,18 +22,26 @@ As of right now, the API is in the process of being rewritten under the "develop
 - Json config
 
 ### Installation
-To install Chatango-Java-API v1.1, I suggest you use maven.  
+To install Chatango-Java-API, I suggest you use maven.  
+You can use JitPack to resolve the API's releases.
+```xml
+<repositories>
+  ...
+  <!-- JitPack - Resolve github releases -->
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+```
+And then add the dependency.
 ```xml
 <dependency>
-    <groupId>com.lenis0012.chatango</groupId>
+    <groupId>com.github.lenis0012</groupId>
     <artifactId>chatango-java-api</artifactId>
-    <version>1.1</version>
-    <scope>system</scope>
-    <systemPath>${project.baseDir}/lib/chatango-java-api.jar</systemPath>
+    <version>1.2</version>
 </dependency>
 ```
-Be sure to download the api to `lib/chatango-java-api.jar`  
-The download can be found under the releases tab
 
 ### Usage
 To connect to a room and interact with it, you should simple call ChatangoAPI.createBot
