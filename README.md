@@ -39,7 +39,7 @@ And then add the dependency.
 <dependency>
     <groupId>com.github.lenis0012</groupId>
     <artifactId>chatango-java-api</artifactId>
-    <version>1.2</version>
+    <version>1.2.1</version>
 </dependency>
 ```
 
