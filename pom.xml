@@ -6,7 +6,7 @@
 
     <groupId>com.lenis0012.chatango</groupId>
     <artifactId>Chatango-API</artifactId>
-    <version>1.2</version>
+    <version>1.2.1</version>
     <packaging>jar</packaging>
     <name>Chatango-Bot</name>
 
